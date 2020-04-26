@@ -38,7 +38,7 @@ json = """
 
 pipeline = pdal.Pipeline(json)
 pipeline.validate() # check if our JSON and options were good
-pipeline.loglevel = 8 #really noisy
+pipeline.loglevel = 8 # really noisy
 count = pipeline.execute()
 arrays = pipeline.arrays
 metadata = pipeline.metadata
@@ -89,8 +89,22 @@ if __name__ == '__main__':
     ax.scatter3D(xyzs.T[0], xyzs.T[1], xyzs.T[2])
 
     # RANSAC
-    m, b = run_ransac(xyzs, estimate, lambda x, y: is_inlier(x, y, 0.1), 3, goal_inliers, max_iterations, stop_at_goal = True)
-    a, b, c, d = m
+    planes = []
+    while len(data_xyz)> 10:
+    	plane = run_ransac(xyzs, estimate, lambda x, y: is_inlier(x, y, 0.1), 3, goal_inliers, max_iterations, stop_at_goal = True)
+    	planes.append(plane)
+
+    	points_index = []
+
+    	# To avoid errors since length of list will become smaller on removing points
+    	for i in range(len(data_xyz)):	
+            if is_inlier(m, data_xyz[j]):
+            	points_index.append(j)
+        
+        for i in range(len(points_index)):
+        	data_xyz.pop(j)
+
+    a, b, c, d = planes[0]['m']
     xx, yy, zz = plot_plane(a, b, c, d)
     ax.plot_surface(xx, yy, zz)
    #x.plot_surface(xx, yy, zz+1, color=(0, 1, 0, 0.5))
